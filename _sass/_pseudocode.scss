@@ -1,0 +1,21 @@
+/* ==========================================================================
+   Pseudocode / algorithm blocks (compact, smaller text)
+   ========================================================================== */
+
+blockquote.pseudocode {
+  font-size: 0.875em;
+  line-height: 1.4;
+  margin: 0.75em 0;
+  padding: 0.5em 1em 0.5em 1em;
+  border-left-width: 3px;
+
+  p,
+  li {
+    margin-bottom: 0.15em;
+  }
+
+  p:last-child,
+  li:last-child {
+    margin-bottom: 0;
+  }
+}
