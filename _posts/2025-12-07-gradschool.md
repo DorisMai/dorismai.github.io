@@ -5,7 +5,7 @@ permalink: /posts/gradschool
 color_tag: "random"
 ---
 
-Many master students I know are applying for doctoral programs now, which makes me want to write down some of my thoughts. I won't talk about comonly discussed topics. Instead, I want to talk about training in an industry-relevant field.
+Many master students I know are applying for doctoral programs now, which makes me want to write down some of my thoughts. I won't talk about commonly discussed topics. Instead, I want to talk about training in an industry-relevant field.
 
 I sometimes joke that I have a cursed taste for advisors that are more likely to leave academia. For example, the PI of my undergraduate research left to join VC, and my first graduate research PI left to be a CEO. I used to think that I was just unlucky and this is a rare situation, but my perspectives have changed. First of all, advisor leaving is actually fairly common. Maybe they didn't get tenure, maybe they relocated to a different university for personal reasons, or maybe they passed away. This issue has probably gone worse recently with the popularity on AI-related topics. More advisors are proactively choosing to spend a fraction of their time or even go all in for startups, rather than leave because they have to or leave for better research environment. 
 

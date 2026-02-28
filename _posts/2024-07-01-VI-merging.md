@@ -9,7 +9,7 @@ tags:
   - crystallography
 ---
 
-[This](https://pmc.ncbi.nlm.nih.gov/articles/PMC10478637/) perspective describes existing algotihms for scaling and merging in crystallography and the recent introduction of variational inference (VI) in this field.
+[This](https://pmc.ncbi.nlm.nih.gov/articles/PMC10478637/) perspective describes existing algorithms for scaling and merging in crystallography and the recent introduction of variational inference (VI) in this field.
 
 Conventional methods estimate the structure factor amplitude $$F= \sqrt{\bar{I}}$$ by averaging redundant measurements of the reflection intensity $$I$$ weighted by their uncertainty $$\sigma_I$$ after performing a scaling that corrects for systematic errors. This approach can be interpreted as the maximum likelihood estimation (MLE), where using normal distribution as the error model, the likelihood of $$N$$ measurements
 

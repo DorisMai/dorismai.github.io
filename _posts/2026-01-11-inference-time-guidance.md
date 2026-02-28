@@ -8,6 +8,8 @@ tags:
   - ML
 ---
 
+Generative models learn to map noise distributions to data distributions. This is a paradigm shift from the single predictions to sampling from a learned distribution, and enables fun things to explore like solving inverse problems.
+
 ## Background
 At inference time of a diffusion model, the plain algorithm (assuming model trained by [score-matching](https://arxiv.org/pdf/1907.05600)) from the perspective of reconstruction is:
  
@@ -25,7 +27,7 @@ At inference time of a diffusion model, the plain algorithm (assuming model trai
 > 8. **return** $$x_0$$
 {: .pseudocode }
 
-Note that training on predicting the added noise ($$\hat{\epsilon}_\theta$$) or the clean sample ($$\hat{x}_0$$) is equivalent to (i.e. mathematically interconvertible) predicting the conditional score $$\nabla_{x_t} \log p(x_t \mid x_0)$$. 
+Note that training on predicting the added noise ($$\hat{\epsilon}_\theta$$) or the clean sample ($$\hat{x}_0$$) is in theory mathematically equivalent/convertible to predicting the conditional score $$\nabla_{x_t} \log p(x_t \mid x_0)$$. 
 
 ## Guidance
 Given an observable $$y$$, a forward model $$y = A(x) + \epsilon$$, guide the inference process to solve the inverse problem that recovers $$x$$ from $$y$$ using the trained model as a prior. $$\epsilon$$ practically represents an error model for the observable, such as normal distribution, student-t distribution, etc. 
@@ -57,9 +59,10 @@ $$
 \begin{aligned}
     p(y\mid x_t) &= \int p(y\mid x_0) p(x_0\mid x_t) dx_0 \\
     &= \mathrm{E}_{x_0 \sim p(x_0\mid x_t)}[p(y\mid x_0)] \\
-    &\approx p(y\mid x_0) \hspace{1em} \text{point estimation}
+    &\approx p(y\mid \hat{x}_0) \hspace{1em} \text{point estimation}
 \end{aligned}
 $$
+
 The likelihood approximation works using Tweedie's formula which shows that $$\hat{x}_0 = \mathrm{E}[x_0\mid x_t]$$.
 
 There are some major risks associated with the this type of guidance approach:
@@ -68,7 +71,7 @@ There are some major risks associated with the this type of guidance approach:
 
 
 ### PnP
-A harder way to enforce consistency with obersable is using [plug-and-play (PnP) guidance](https://arxiv.org/pdf/2305.08995). The main difference is PnP directly minimizes $$\hat{x}_0$$ with respect to likelihood loss rather than taking a small gradient step like in DPS.
+A harder way to enforce consistency with observable is using [plug-and-play (PnP) guidance](https://arxiv.org/pdf/2305.08995). The main difference is PnP directly minimizes $$\hat{x}_0$$ with respect to likelihood loss rather than taking a small gradient step like in DPS.
 
 > **Input:** Noise balance schedule $$\zeta(t)$$, Observable $$y$$, Forward model $$A$$ and error model $$\epsilon(t)$$, Diffusion noise schedule $$\sigma(t)$$, Langevin noise schedule $$\eta(t)$$, Trained score model $$s_\theta(x_t, t)$$
 >
@@ -99,16 +102,16 @@ A popular approach in guidance is to use sequential Monte Carlo (SMC) for partic
 > **Output:** Sample $$\{x_0^k\}_{k=1}^K$$
 >
 > 1. **for** $$k = 1, 2, \dots, K$$ **do** $$\hspace{1em}$$ # Initialize particles
-> 2.    $$\hspace{1em}$$ Sample $$x_T^{(k)} \sim \mathcal{N}(0, I)$$  
-> 3.    $$\hspace{1em}$$ $$w_k^T \leftarrow p(y\mid x_T^{(k)} \approx \hat{x}_0^k)$$
+> 2.    $$\hspace{1em}$$ Sample $$x_T^{k} \sim \mathcal{N}(0, I)$$  
+> 3.    $$\hspace{1em}$$ $$w_T^{k} \leftarrow p(y\mid x_T^{k} \approx \hat{x}_0^k)$$
 > 4. **for** $$t = T-1, \dots, 1$$ **do** $$\hspace{1em}$$ # Denoising steps
-> 5.    $$\hspace{1em}$$ $$\{x_k^{t+1}\}_{k=1}^K \sim \mathrm{Multinomial}(\{w_k^{t+1}\}_{k=1}^K)$$ $$\hspace{1em}$$ # resample
+> 5.    $$\hspace{1em}$$ $$\{x_{t+1}^k\}_{k=1}^K \sim \mathrm{Multinomial}(\{w_{t+1}^k\}_{k=1}^K)$$ $$\hspace{1em}$$ # resample
 > 6.    $$\hspace{1em}$$ **for** $$k = 1, 2, \dots, K$$ **do**
-> 7.    $$\hspace{2em}$$ $$\hat{s}^k \leftarrow s_\theta(x_k^{t+1}, t)$$
-> 8.    $$\hspace{2em}$$ $$\hat{x}_0^k = \mathrm{GetPredictedCleanSample}(x_k^{t+1}, \hat{s}, \sigma(t))$$
+> 7.    $$\hspace{2em}$$ $$\hat{s}^k \leftarrow s_\theta(x_{t+1}^k, t)$$
+> 8.    $$\hspace{2em}$$ $$\hat{x}_0^k = \mathrm{GetPredictedCleanSample}(x_{t+1}^k, \hat{s}^k, \sigma(t))$$
 > 9.    $$\hspace{2em}$$ $$\hat{s}_y^k \leftarrow \hat{s}^k + \nabla_{x_t} \log p(y\mid x_{t+1}^k \approx \hat{x}_0^k)$$
-> 10.    $$\hspace{2em}$$ $$x_{k}^{t} = \mathrm{GaussianTransition}(\hat{s}_y^k, x_k^{t+1}, \sigma(t))$$ $$\hspace{1em}$$ # propose
-> 11.    $$\hspace{2em}$$ $$w_k^t \leftarrow \frac{\mathrm{GaussianTransition}(\hat{s}^k, x_k^{t+1}, \sigma(t))}{\mathrm{GaussianTransition}(\hat{s}^k_y, x_k^{t+1}, \sigma(t))} \frac{p(y\mid x_t^k \approx \hat{x}_0^k)}{p(y\mid x_{t+1}^k \approx \hat{x}_0^k)}$$ $$\hspace{1em}$$ # reweight
+> 10.    $$\hspace{2em}$$ $$x_{t}^k = \mathrm{GaussianTransition}(\hat{s}_y^k, x_{t+1}^k, \sigma(t))$$ $$\hspace{1em}$$ # propose
+> 11.    $$\hspace{2em}$$ $$w_t^k \leftarrow \frac{\mathrm{GaussianTransition}(\hat{s}^k, x_{t+1}^k, \sigma(t))}{\mathrm{GaussianTransition}(\hat{s}^k_y, x_{t+1}^k, \sigma(t))} \frac{p(y\mid x_t^k \approx \hat{x}_0^k)}{p(y\mid x_{t+1}^k \approx \hat{x}_0^k)}$$ $$\hspace{1em}$$ # reweight
 > 12.    $$\hspace{1em}$$ **end for**
 > 13. **end for**
 > 14. **return** $$\{x_0^k\}_{k=1}^K$$

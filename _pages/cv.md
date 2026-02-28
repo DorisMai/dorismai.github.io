@@ -17,7 +17,10 @@ redirect_from:
 
 ---
 # Selected professional experience
-* Research Associate - [MLCV@SLAC](https://lcls-mlcv.github.io/) (09/2024 - present)
+* Scientist - [diffUSE Project @ Astera](https://diffuse.science/) (02/2026 - present)
+  * Develop computational methods to model structural dynamics from Bragg and diffuse scattering data.
+
+* Research Associate - [MLCV@SLAC](https://lcls-mlcv.github.io/) (09/2024 - 02/2026)
   * Develop and implement [machine learning algorithms](https://github.com/DorisMai/abismal_torch) for macromolecular crystallography, and translate research outcomes into operations at LCLS. [Slides (2025 ACA Invited Talk)](https://docs.google.com/presentation/d/1VvBTk06yBm0cFEA91ZJYH0vYohx02drm70LbBemrsxs/edit?usp=sharing)
   * Support user experiments by assisting their data analysis for real-time feedback and reprocessing.
   * Mentor students on research projects.
